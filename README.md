@@ -30,6 +30,15 @@ Em VRAM limitada, a complexidade O(n²) do Self-Attention causa OOM. Este lab de
 
 Redução de ≈60% do footprint inicial graças à quantização QLoRA 4-bit.
 
+### Passo 2 — Tamanho do contexto recuperado
+
+| Item                              | Valor                       |
+|-----------------------------------|-----------------------------|
+| Fonte                             | `pubmed_qa` / `pqa_artificial` |
+| Trechos concatenados              | ~80                         |
+| Caracteres do prompt              | ~60.000                     |
+| Tokens reais (Qwen tokenizer)     | ~12.000 *(preencher)*       |
+
 ## Execução
 
 Notebook único: `lab10.ipynb`, alvo Google Colab Free (GPU T4, 15GB).
