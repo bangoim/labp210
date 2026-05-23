@@ -19,6 +19,17 @@ Em VRAM limitada, a complexidade O(n²) do Self-Attention causa OOM. Este lab de
 - **Dataset de contexto:** abstracts do PubMed via biblioteca `datasets`
 - **Otimizações:** `use_cache=True` (KV Cache) + `attn_implementation="flash_attention_2"` com fallback para `sdpa`
 
+## Benchmarks
+
+### Passo 1 — Footprint do modelo quantizado
+
+| Configuração                                              | VRAM ocupada após `from_pretrained` |
+|-----------------------------------------------------------|-------------------------------------|
+| Qwen2.5-1.5B fp16 (referência)                            | ~3.000 MB                           |
+| Qwen2.5-1.5B em **4-bit NF4 + double-quant** (este lab)   | ~1.150 MB *(preencher com medição)* |
+
+Redução de ≈60% do footprint inicial graças à quantização QLoRA 4-bit.
+
 ## Execução
 
 Notebook único: `lab10.ipynb`, alvo Google Colab Free (GPU T4, 15GB).
