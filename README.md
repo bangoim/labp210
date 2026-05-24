@@ -39,6 +39,16 @@ Redução de ≈60% do footprint inicial graças à quantização QLoRA 4-bit.
 | Caracteres do prompt              | ~60.000                     |
 | Tokens reais (Qwen tokenizer)     | ~12.000 *(preencher)*       |
 
+### Passo 3 — Baseline sem KV Cache
+
+Geração de 100 tokens com `model.config.use_cache = False`. A cada novo token, o modelo refaz o forward completo sobre os ~12k tokens de contexto.
+
+| Métrica                                    | Valor                       |
+|--------------------------------------------|-----------------------------|
+| Tempo total de geração                     | ~ *(preencher)* s           |
+| Pico de VRAM (`max_memory_allocated`)      | ~ *(preencher)* MB          |
+| Comportamento                              | recalculo redundante O(n²) por step |
+
 ## Execução
 
 Notebook único: `lab10.ipynb`, alvo Google Colab Free (GPU T4, 15GB).
