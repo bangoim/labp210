@@ -49,6 +49,15 @@ Geração de 100 tokens com `model.config.use_cache = False`. A cada novo token,
 | Pico de VRAM (`max_memory_allocated`)      | ~ *(preencher)* MB          |
 | Comportamento                              | recalculo redundante O(n²) por step |
 
+### Resumo consolidado — antes × depois
+
+| Métrica                          | Baseline (sem cache, eager) | Otimizado (KV Cache + FA2/SDPA) | Ganho        |
+|----------------------------------|-----------------------------|---------------------------------|--------------|
+| Tempo de geração (100 tokens)    | ~ *(preencher)* s           | ~ *(preencher)* s               | ~ *Nx*       |
+| Pico de VRAM durante geração     | ~ *(preencher)* MB          | ~ *(preencher)* MB              | ~ *–N %*     |
+| Crescimento de VRAM por token    | linear (O(n))               | quase plano                     | constante    |
+| Complexidade por step do decoder | O(n²)                       | O(n)                            | quadrática → linear |
+
 ### Passo 4 — KV Cache + FlashAttention-2
 
 Modelo recarregado com `attn_implementation="flash_attention_2"` (fallback para `sdpa` em GPUs Turing como a T4 do Colab Free, que não suporta FA2). KV Cache ativo: cada step de decoder reaproveita K e V dos steps anteriores.
