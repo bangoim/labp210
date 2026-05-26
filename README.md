@@ -49,6 +49,18 @@ Geração de 100 tokens com `model.config.use_cache = False`. A cada novo token,
 | Pico de VRAM (`max_memory_allocated`)      | ~ *(preencher)* MB          |
 | Comportamento                              | recalculo redundante O(n²) por step |
 
+### Passo 4 — KV Cache + FlashAttention-2
+
+Modelo recarregado com `attn_implementation="flash_attention_2"` (fallback para `sdpa` em GPUs Turing como a T4 do Colab Free, que não suporta FA2). KV Cache ativo: cada step de decoder reaproveita K e V dos steps anteriores.
+
+| Métrica                                    | Valor                       |
+|--------------------------------------------|-----------------------------|
+| Atenção em uso                             | `flash_attention_2` ou `sdpa` (fallback) |
+| Tempo total de geração                     | ~ *(preencher)* s           |
+| Pico de VRAM                               | ~ *(preencher)* MB          |
+| **Speedup vs baseline**                    | ~ *(preencher)* x           |
+| **Redução do pico de VRAM**                | ~ *(preencher)* %           |
+
 ## Execução
 
 Notebook único: `lab10.ipynb`, alvo Google Colab Free (GPU T4, 15GB).
