@@ -64,3 +64,9 @@ Modelo recarregado com `attn_implementation="flash_attention_2"` (fallback para 
 ## Execução
 
 Notebook único: `lab10.ipynb`, alvo Google Colab Free (GPU T4, 15GB).
+
+## Parecer técnico
+
+### Parte A — Como QLoRA + KV Cache + FlashAttention salvaram o Transformer
+
+A combinação das três técnicas converte um forward inviável num pipeline executável em VRAM finita. **QLoRA 4-bit** corta o footprint dos pesos em ~60% antes do primeiro token ser gerado, liberando ~3GB de espaço na T4 para acomodar os ~12k tokens recuperados pelo RAG. A ativação do **KV Cache** reduz a complexidade do laço de decoder de O(n²) para O(n) por step, eliminando o recálculo redundante de Q, K e V sobre todo o contexto a cada palavra gerada — neste lab isso se traduziu num speedup expressivo e em latência praticamente constante por token. Já o **FlashAttention-2** (ou seu fallback `sdpa` em GPUs Turing como a T4) age na ineficiência de hardware: em vez de materializar a matriz `n×n` de atenção na HBM lenta, fragmenta o cálculo em blocos que cabem na SRAM rápida da GPU, eliminando o pico de memória durante o prompting — quando os 12k tokens são processados de uma única vez. Sem essas três camadas, o mesmo prompt estouraria a VRAM da T4 já no primeiro forward, porque o tensor de atenção `12k × 12k × n_heads × fp16` sozinho passa de 5GB.
