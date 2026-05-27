@@ -16,8 +16,12 @@ Em VRAM limitada, a complexidade O(n²) do Self-Attention causa OOM. Este lab de
 
 - **Modelo gerador:** `Qwen/Qwen2.5-1.5B-Instruct` (janela de 32k tokens, Apache 2.0)
 - **Quantização:** `bitsandbytes` 4-bit (NF4 + double quant, compute em float16)
-- **Dataset de contexto:** abstracts do PubMed via biblioteca `datasets`
+- **Dataset de contexto:** abstracts do PubMed via `qiaojin/PubMedQA`
 - **Otimizações:** `use_cache=True` (KV Cache) + `attn_implementation="flash_attention_2"` com fallback para `sdpa`
+
+### Limite prático no Colab Free (T4, 15GB)
+
+O baseline do Passo 3 (sem KV Cache, atenção materializada) **estoura a VRAM da T4** com contextos acima de ~6k tokens, porque o tensor de atenção `n × n × n_heads × fp16` cresce quadraticamente. Para o lab rodar ponta-a-ponta no tier gratuito, `ALVO_CARACTERES = 20_000` (~5k tokens) é o teto seguro. Em GPU Ampere+ (L4/A100) com FlashAttention-2 instalado, pode-se subir até ≥12k tokens sem OOM.
 
 ## Benchmarks
 
@@ -34,14 +38,14 @@ Redução de ≈60% do footprint inicial graças à quantização QLoRA 4-bit.
 
 | Item                              | Valor                       |
 |-----------------------------------|-----------------------------|
-| Fonte                             | `pubmed_qa` / `pqa_artificial` |
-| Trechos concatenados              | ~80                         |
-| Caracteres do prompt              | ~60.000                     |
-| Tokens reais (Qwen tokenizer)     | ~12.000 *(preencher)*       |
+| Fonte                             | `qiaojin/PubMedQA` / `pqa_artificial` |
+| Trechos concatenados              | ~25                         |
+| Caracteres do prompt              | ~20.000                     |
+| Tokens reais (Qwen tokenizer)     | ~5.000 *(preencher)*        |
 
 ### Passo 3 — Baseline sem KV Cache
 
-Geração de 100 tokens com `model.config.use_cache = False`. A cada novo token, o modelo refaz o forward completo sobre os ~12k tokens de contexto.
+Geração de 100 tokens com `model.config.use_cache = False`. A cada novo token, o modelo refaz o forward completo sobre os ~5k tokens de contexto (limite ajustado para caber em T4 Free; ver "Limite prático" acima).
 
 | Métrica                                    | Valor                       |
 |--------------------------------------------|-----------------------------|
